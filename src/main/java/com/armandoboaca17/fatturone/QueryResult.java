@@ -17,6 +17,7 @@ public class QueryResult extends VBox {
             gridEmployeeEmail,
             gridOrder,
             gridTotOrder;
+
     private Label
             lCustomerNumber,
             lcustomerName,
