@@ -1,6 +1,7 @@
 module com.armandoboaca17.fatturone {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
 
 
     opens com.armandoboaca17.fatturone to javafx.fxml;
