@@ -45,6 +45,11 @@ public class OrderDetailResult {
         this.scontoPercentuale = scontoPercentuale;
         this.totaleOrdine = totaleOrdine;
     }
+
+    public OrderDetailResult() {
+
+    }
+
     // GETTER e SETTER per ogni campo
     public int getCustomerNumber() { return customerNumber; }
     public void setCustomerNumber(int customerNumber) { this.customerNumber = customerNumber; }
@@ -96,9 +101,23 @@ public class OrderDetailResult {
 
     @Override
     public String toString() {
-        return String.format(
-                "Ordine %s | Cliente: %s | Prodotto: %s | Quantità: %d | Totale: €%.2f | Sconto: %.2f%%",
-                orderNumber, customerName, productName, quantityOrdered, totaleProdotto, scontoPercentuale
-        );
+        return "OrdineDettaglio {" + "\n" +
+                "  customerNumber=" + customerNumber + ",\n" +
+                "  customerName='" + customerName + '\'' + ",\n" +
+                "  phone='" + phone + '\'' + ",\n" +
+                "  indirizzoSpedizione='" + indirizzoSpedizione + '\'' + ",\n" +
+                "  salesRepEmployeeNumber=" + salesRepEmployeeNumber + ",\n" +
+                "  responsabile='" + responsabile + '\'' + ",\n" +
+                "  email='" + email + '\'' + ",\n" +
+                "  orderNumber='" + orderNumber + '\'' + ",\n" +
+                "  orderDate=" + orderDate + ",\n" +
+                "  productCode='" + productCode + '\'' + ",\n" +
+                "  productName='" + productName + '\'' + ",\n" +
+                "  quantityOrdered=" + quantityOrdered + ",\n" +
+                "  priceEach=" + priceEach + ",\n" +
+                "  totaleProdotto=" + totaleProdotto + ",\n" +
+                "  scontoPercentuale=" + scontoPercentuale + "%,\n" +
+                "  totaleOrdine=" + totaleOrdine + "\n" +
+                '}';
     }
 }

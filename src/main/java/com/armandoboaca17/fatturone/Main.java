@@ -71,8 +71,9 @@ public class Main extends Application {
         mostraFattura.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                V.orderNumber = Integer.parseInt(tfInOrder.getText());
-                stage.setTitle("fattura/bolla nr. ordine: "+ V.orderNumber +" - FatturOne");
+                V.ORDER_NUMBER = Integer.parseInt(tfInOrder.getText());
+                stage.setTitle("fattura/bolla nr. ordine: "+ V.ORDER_NUMBER +" - FatturOne");
+                DBConnection.eseguiQuery();
                 stage.setScene(queryResult);
             }
         });
