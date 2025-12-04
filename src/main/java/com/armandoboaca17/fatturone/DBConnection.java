@@ -9,7 +9,7 @@ import java.util.List;
 
 
 public class DBConnection {
-    private static final String SQL_QUERY = "SELECT " +
+    private static String SQL_QUERY = "SELECT " +
             "customers.customerNumber, " +
             "customers.customerName, " +
             "customers.phone, " +
@@ -42,11 +42,45 @@ public class DBConnection {
             "JOIN orders ON customers.customerNumber = orders.customerNumber " +
             "JOIN orderdetails ON orders.orderNumber = orderdetails.orderNumber " +
             "JOIN products ON orderdetails.productCode = products.productCode " +
-            "WHERE orders.orderNumber LIKE '"+ V.ORDER_NUMBER +"'";
+            "WHERE orders.orderNumber LIKE '"+ V.getOrderNumber() +"'";
 
 
     public static void eseguiQuery() {
-
+        String SQL_QUERY = "SELECT " +
+                "customers.customerNumber, " +
+                "customers.customerName, " +
+                "customers.phone, " +
+                "CONCAT_WS(', ', " +
+                "customers.addressLine1, " +
+                "customers.addressLine2, " +
+                "customers.city, " +
+                "COALESCE(customers.state, ''), " +
+                "customers.postalCode, " +
+                "customers.country " +
+                ") AS indirizzo_spedizione, " +
+                "customers.salesRepEmployeeNumber, " +
+                "CONCAT(employees.lastName, ' ', employees.firstName) AS responsabile, " +
+                "employees.email, " +
+                "orders.orderNumber, " +
+                "orders.orderDate, " +
+                "orderdetails.productCode, " +
+                "products.productName, " +
+                "orderdetails.quantityOrdered, " +
+                "orderdetails.priceEach, " +
+                "(orderdetails.quantityOrdered * orderdetails.priceEach) AS totale_prodotto, " +
+                "CASE " +
+                "WHEN products.MSRP > 0 AND orderdetails.priceEach <= products.MSRP " +
+                "THEN ROUND(((products.MSRP - orderdetails.priceEach) / products.MSRP) * 100, 2) " +
+                "ELSE 0 " +
+                "END AS sconto_percentuale, " +
+                "SUM(orderdetails.quantityOrdered * orderdetails.priceEach) OVER(PARTITION BY orders.orderNumber) AS totale_ordine " +
+                "FROM customers " +
+                "JOIN employees ON customers.salesRepEmployeeNumber = employees.employeeNumber " +
+                "JOIN orders ON customers.customerNumber = orders.customerNumber " +
+                "JOIN orderdetails ON orders.orderNumber = orderdetails.orderNumber " +
+                "JOIN products ON orderdetails.productCode = products.productCode " +
+                "WHERE orders.orderNumber LIKE '"+ V.getOrderNumber() +"'";
+        V.LISTAORDINI.clear();
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");

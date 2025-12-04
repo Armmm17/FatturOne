@@ -6,11 +6,20 @@ import java.util.List;
 
 public class V {
     public static int WIDTH = 720;
-    public static int HEIGHT = 600;
+    public static int HEIGHT = 480;
 
     public static String DBURL = "jdbc:mysql://localhost:3306/dipendenti";
     public static String DBUSER = "root";
     public static String DBPASSWORD = "";
+
+    public static int getOrderNumber() {
+        return ORDER_NUMBER;
+    }
+
+    public static void setOrderNumber(int orderNumber) {
+        ORDER_NUMBER = orderNumber;
+    }
+
     public static int ORDER_NUMBER;
 
     public static List<OrderDetailResult> LISTAORDINI = new ArrayList<>();

@@ -1,14 +1,25 @@
 package com.armandoboaca17.fatturone;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
+import javafx.stage.Stage;
 
-public class QueryResult extends VBox {
-    private Main main;
+import java.util.HashMap;
+import java.util.Map;
+
+public class QueryResult extends Stage {
+    private Scene scene;
+    private VBox root;
 
     private GridPane
             gridCustomer,
@@ -46,14 +57,17 @@ public class QueryResult extends VBox {
             tfProductsTable,
             tfOrderTotal;
 
+    private StackPane stackPane;
+    private TableView tvOrderDetail;
 
 
 
 
-
-    public QueryResult(Main main) {
-        this.main = main;
-        setBackground(new Background(new BackgroundFill(Paint.valueOf("#e3e3e3"), CornerRadii.EMPTY, Insets.EMPTY)));
+    public QueryResult() {
+        this.root = new VBox(20);
+        this.scene = new Scene(this.root, V.WIDTH, (V.HEIGHT*2));
+        this.root.setBackground(new Background(new BackgroundFill(Paint.valueOf("#e3e3e3"), CornerRadii.EMPTY, Insets.EMPTY)));
+        this.setTitle("fattura/bolla nr. ordine: "+ V.getOrderNumber() +" - FatturOne");
 
 
         /*
@@ -71,8 +85,8 @@ public class QueryResult extends VBox {
         this.gridCustomer.setPadding(new Insets(5, 0, 5, 15));
         this.lCustomerNumber = new Label("Customer Number");
         this.lcustomerName = new Label("Customer Name");
-        this.tfCustomerNumber = new TextField("Num");
-        this.tfcustomerName = new TextField("Name");
+        this.tfCustomerNumber = new TextField(V.LISTAORDINI.get(0).getCustomerNumber() + "");
+        this.tfcustomerName = new TextField(V.LISTAORDINI.get(0).getCustomerName());
         this.tfCustomerNumber.setMaxWidth(200);
         this.tfCustomerNumber.setEditable(false);
         this.tfcustomerName.setMaxWidth(200);
@@ -91,7 +105,7 @@ public class QueryResult extends VBox {
         this.gridShippingAddress.setVgap(5);
         this.gridShippingAddress.setPadding(new Insets(5, 0, 5, 15));
         this.lShippingAddress = new Label("Shipping Address");
-        this.tfShippingAddress = new TextField("via/piazza, citta, regione, stato");
+        this.tfShippingAddress = new TextField(V.LISTAORDINI.get(0).getIndirizzoSpedizione());
         this.tfShippingAddress.setMaxWidth(250);
         this.tfShippingAddress.setEditable(false);
         this.gridShippingAddress.add(this.lShippingAddress, 0, 1);
@@ -106,7 +120,7 @@ public class QueryResult extends VBox {
         this.gridPhone.setVgap(5);
         this.gridPhone.setPadding(new Insets(5, 0, 5, 15));
         this.lPhone = new Label("Phone");
-        this.tfPhone = new TextField("num");
+        this.tfPhone = new TextField(V.LISTAORDINI.get(0).getPhone());
         this.tfPhone.setMaxWidth(250);
         this.tfPhone.setEditable(false);
         this.gridPhone.add(this.lPhone, 0, 1);
@@ -122,8 +136,8 @@ public class QueryResult extends VBox {
         this.gridEmployee.setPadding(new Insets(5, 0, 5, 15));
         this.lEmployeeNumber = new Label("Employee number");
         this.lEmployeeName = new Label("Employee name");
-        this.tfEmployeeNumber = new TextField("num");
-        this.tfEmployeeName = new TextField("name");
+        this.tfEmployeeNumber = new TextField(V.LISTAORDINI.get(0).getSalesRepEmployeeNumber()+"");
+        this.tfEmployeeName = new TextField(V.LISTAORDINI.get(0).getResponsabile());
         this.tfEmployeeNumber.setMaxWidth(250);
         this.tfEmployeeNumber.setEditable(false);
         this.tfEmployeeName.setMaxWidth(250);
@@ -142,7 +156,7 @@ public class QueryResult extends VBox {
         this.gridEmployeeEmail.setVgap(5);
         this.gridEmployeeEmail.setPadding(new Insets(5, 0, 5, 15));
         this.lEmployeeEmail = new Label("Employee Email");
-        this.tfEmployeeEmail = new TextField("email");
+        this.tfEmployeeEmail = new TextField(V.LISTAORDINI.get(0).getEmail());
         this.tfEmployeeEmail.setMaxWidth(250);
         this.tfEmployeeEmail.setEditable(false);
         this.gridEmployeeEmail.add(this.lEmployeeEmail, 0, 1);
@@ -157,8 +171,8 @@ public class QueryResult extends VBox {
         this.gridOrder.setPadding(new Insets(5, 0, 5, 15));
         this.lOrderNumber = new Label("Order Number");
         this.lOrderDate = new Label("Order date");
-        this.tfOrderNumber = new TextField("num");
-        this.tfOrderDate = new TextField("date");
+        this.tfOrderNumber = new TextField(V.LISTAORDINI.get(0).getOrderNumber());
+        this.tfOrderDate = new TextField(V.LISTAORDINI.get(0).getOrderDate() + "");
         this.tfOrderNumber.setMaxWidth(250);
         this.tfOrderNumber.setEditable(false);
         this.tfOrderDate.setMaxWidth(250);
@@ -169,7 +183,52 @@ public class QueryResult extends VBox {
         this.gridOrder.add(this.tfOrderDate, 1, 2);
 
 
-        //INSERIRE DETTAGLIO ORDINE QUA
+        this.tvOrderDetail = new TableView<Map<String, String>>();
+
+        this.tvOrderDetail.setEditable(true);
+
+        TableColumn<Map<String, String>, String> colProductCode = new TableColumn<>("Product Code");
+        TableColumn<Map<String, String>, String> colProductName = new TableColumn<>("Product Name");
+        TableColumn<Map<String, String>, String> colQuantity = new TableColumn<>("quantity");
+        TableColumn<Map<String, String>, String> colPriceEach = new TableColumn<>("Price each");
+        TableColumn<Map<String, String>, String> colTotalXItem = new TableColumn<>("total");
+        TableColumn<Map<String, String>, String> colItemDiscount = new TableColumn<>("discount");
+
+        this.tvOrderDetail.getColumns().addAll(colProductCode, colProductName, colQuantity, colPriceEach, colTotalXItem, colItemDiscount);
+        this.tvOrderDetail.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+
+
+
+// Set cell value factories
+        colProductCode.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get("productCode")));
+        colProductName.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get("productName")));
+        colQuantity.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get("quantity")));
+        colPriceEach.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get("priceEach")));
+        colTotalXItem.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get("totalXItem")));
+        colItemDiscount.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().get("itemDiscount")));
+
+// Create sample data
+        ObservableList<Map<String, String>> sampleData = FXCollections.observableArrayList();
+
+        for (int i = 0; i < V.LISTAORDINI.size(); i++) {
+            Map<String, String> row = new HashMap<>();
+            row.put("productCode", V.LISTAORDINI.get(i).getProductCode());
+            row.put("productName", V.LISTAORDINI.get(i).getProductName());
+            row.put("quantity", V.LISTAORDINI.get(i).getQuantityOrdered() + "");
+            row.put("priceEach", V.LISTAORDINI.get(i).getPriceEach() + "");
+            row.put("totalXItem", V.LISTAORDINI.get(i).getTotaleProdotto() + "");
+            row.put("itemDiscount", V.LISTAORDINI.get(i).getScontoPercentuale() + "");
+            sampleData.add(row);
+        }
+
+        this.tvOrderDetail.setItems(sampleData);
+
+
+
+        this.stackPane = new StackPane(this.tvOrderDetail);
+        this.stackPane.setAlignment(Pos.CENTER);
+        this.stackPane.setPadding(new Insets(20, 20, 20, 20));
 
 
         this.gridTotOrder = new GridPane(1,2);
@@ -179,7 +238,7 @@ public class QueryResult extends VBox {
         this.gridTotOrder.setVgap(5);
         this.gridTotOrder.setPadding(new Insets(5, 15, 5, 0));
         this.lOrderTotal = new Label("Totale ordine");
-        this.tfOrderTotal = new TextField("$");
+        this.tfOrderTotal = new TextField(V.LISTAORDINI.get(0).getTotaleOrdine()+ " €");
         this.tfOrderTotal.setMaxWidth(250);
         this.tfOrderTotal.setEditable(false);
         this.gridTotOrder.add(this.lOrderTotal, 0, 1);
@@ -191,30 +250,18 @@ public class QueryResult extends VBox {
 
 
 
-        /* NameField : TextField
-        this.lName = new Label("House name :");
-        this.tfName = new TextField("");
-        this.tfName.setMaxWidth(250);
-        this.tfName.setEditable(false);
-        this.grid.add(this.lName, 0, 1);
-        this.grid.add(this.tfName, 1, 1);
 
 
-         */
+        this.root.getChildren().add(gridCustomer);
+        this.root.getChildren().add(gridShippingAddress);
+        this.root.getChildren().add(gridPhone);
+        this.root.getChildren().add(gridEmployee);
+        this.root.getChildren().add(gridEmployeeEmail);
+        this.root.getChildren().add(gridOrder);
+        this.root.getChildren().add(this.tvOrderDetail);
+        this.root.getChildren().add(gridTotOrder);
 
-
-
-
-
-
-        this.getChildren().add(gridCustomer);
-        this.getChildren().add(gridShippingAddress);
-        this.getChildren().add(gridPhone);
-        this.getChildren().add(gridEmployee);
-        this.getChildren().add(gridEmployeeEmail);
-        this.getChildren().add(gridOrder);
-        this.getChildren().add(gridTotOrder);
-
+        this.setScene(scene);
 
     }
 }

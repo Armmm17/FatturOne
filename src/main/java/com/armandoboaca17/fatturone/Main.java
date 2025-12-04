@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
@@ -20,7 +19,6 @@ public class Main extends Application {
     Stage stage;
 
     Scene main;
-    Scene queryResult;
 
 
     @Override
@@ -36,15 +34,11 @@ public class Main extends Application {
 
 
         //Instazio Scene figlie
-        QueryResult qr = new QueryResult(this);
 
 
 
         // Instanzio Scene utilizaabili
         this.main = new Scene(root, V.WIDTH, V.HEIGHT);
-        this.queryResult = new Scene(qr, V.WIDTH, V.HEIGHT);
-
-
 
 
         //SCENA MAIN
@@ -71,10 +65,11 @@ public class Main extends Application {
         mostraFattura.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                V.ORDER_NUMBER = Integer.parseInt(tfInOrder.getText());
-                stage.setTitle("fattura/bolla nr. ordine: "+ V.ORDER_NUMBER +" - FatturOne");
+                V.LISTAORDINI.clear();
+                V.setOrderNumber(Integer.parseInt(tfInOrder.getText()));
                 DBConnection.eseguiQuery();
-                stage.setScene(queryResult);
+                QueryResult qr = new QueryResult();
+                qr.show();
             }
         });
 
